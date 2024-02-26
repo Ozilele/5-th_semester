@@ -1,0 +1,27 @@
+[abc] -> matches "a", "b", "c" bracket matches single character which is contained inside these brackets
+^ - początek linii
+* - 0 lub więcej razy
+([:blank:] -> space and TAB chars only)
+$ - matchuje koncowa pozycje stringa albo pozycje przed znakiem nowej linii(koncowa pozycja wiersza)
++ - matchuje poprzedni element raz lub kilka razy
+. - any character
+
+
+// \/\/(.*) {}; 
+
+// \/\/(.*)[\r\n]{3};
+/*
+\/\*([^*]|[\r\n])*\*\/ {};
+*/
+// {start}.*{end} {}; 
+
+/*Starting character sequence for multiline comment*/ 
+start \/\* 
+/*Ending character sequence for multiline comment*/ 
+end  \*\/ 
+
+// regex do dopasowania include 
+// regex dopasowujący /// lub //!
+// regex dopasowujący /** lub /*!
+// regex do single comment(//)
+// regex początku komentarza wielolinijkowego(/*)
