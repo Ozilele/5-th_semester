@@ -1,0 +1,63 @@
+
+Bison/Lex:
+
+    | '-' expr %prec UMINUS {
+      int opp = opposite($2, P);
+      $$ = opp;
+      int len = floor(log10(abs($2 % P))) + 1;
+      size_t dzial_len = strlen(dzialanie);
+      int i = (int)dzial_len - len - 1;
+      while(i < (int)dzial_len) {
+        dzialanie[i] = '\0';
+        i++;
+      }
+      char base[20];
+      snprintf(base, sizeof(base), "%d ", opp); 
+      strcat(dzialanie, base);
+    }
+    | expr '^' exponent {
+      int result = p_exponentiation($1, $3);
+      $$ = result;
+      strcat(dzialanie, "^ ");
+    } 
+    | '-' '(' expr ')'              { 
+      strcat(dzialanie, "- "); 
+      $$ = P - $3;
+    }
+    | '(' expr ')'                  { $$ = $2; }
+;
+
+Python:
+
+def p_expression_neg(p):
+    'expression : SUB expression %prec NEG'
+    global rpn, fs
+    opposite = fs.opposite(p[2])
+    value_len = int(math.floor(math.log10(abs(p[2] % P)))) + 1
+    dzialanie_len = sum(len(x) for x in rpn)
+
+    if value_len >= dzialanie_len:
+        rpn = []
+    else:
+        pattern = re.compile(f".*{'.' * (dzialanie_len - value_len)}")
+        rpn = [re.sub(pattern, '', element) for element in rpn]
+    # print(f"rpn to {rpn}")
+    base = f"{opposite} "
+    rpn.append(base)
+    p[0] = fs.opposite(p[2])
+
+def p_expression_pow(p):
+    'expression : expression POW exponent'
+    global rpn, fs
+    p[0] = fs.power(p[1], p[3])
+    rpn.append('^ ')
+
+def p_expression_neg_parent(p):
+    'expression : SUB L_BRA expression R_BRA'
+    global rpn, fs
+    rpn.append("- ")
+    p[0] = P - p[3]
+
+def p_expression_parent(p):
+    'expression : L_BRA expression R_BRA'
+    p[0] = p[2]
